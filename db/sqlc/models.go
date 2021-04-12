@@ -5,6 +5,11 @@ package db
 import ()
 
 type Villager struct {
-	ID       int64  `json:"id"`
-	Villager string `json:"villager"`
+	ID          int64  `json:"id"`
+	Name        string `json:"name"`
+	Image       string `json:"image"`
+	Species     string `json:"species"`
+	Personality string `json:"personality"`
+	Birthday    string `json:"birthday"`
+	Quote       string `json:"quote"`
 }

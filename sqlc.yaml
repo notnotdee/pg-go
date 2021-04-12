@@ -2,7 +2,7 @@ version: "1"
 packages:
   - name: "db"
     path: "./db/sqlc"
-    queries: "./db/query/"
+    queries: "./db/queries/"
     schema: "./db/schema/"
     engine: "postgresql"
     emit_json_tags: true

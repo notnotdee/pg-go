@@ -8,27 +8,96 @@ import (
 )
 
 const createVillager = `-- name: createVillager :one
-INSERT INTO villagers (villager) 
-VALUES ($1) 
-RETURNING id, villager
+INSERT INTO villagers (name, image, species, personality, birthday, quote) 
+VALUES ($1, $2, $3, $4, $5, $6) 
+RETURNING id, name, image, species, personality, birthday, quote
 `
 
-func (q *Queries) createVillager(ctx context.Context, villager string) (Villager, error) {
-	row := q.db.QueryRowContext(ctx, createVillager, villager)
+type createVillagerParams struct {
+	Name        string `json:"name"`
+	Image       string `json:"image"`
+	Species     string `json:"species"`
+	Personality string `json:"personality"`
+	Birthday    string `json:"birthday"`
+	Quote       string `json:"quote"`
+}
+
+func (q *Queries) createVillager(ctx context.Context, arg createVillagerParams) (Villager, error) {
+	row := q.db.QueryRowContext(ctx, createVillager,
+		arg.Name,
+		arg.Image,
+		arg.Species,
+		arg.Personality,
+		arg.Birthday,
+		arg.Quote,
+	)
 	var i Villager
-	err := row.Scan(&i.ID, &i.Villager)
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Image,
+		&i.Species,
+		&i.Personality,
+		&i.Birthday,
+		&i.Quote,
+	)
 	return i, err
 }
 
 const getVillager = `-- name: getVillager :one
-SELECT id, villager FROM villagers
-WHERE villager = $1 
+SELECT id, name, image, species, personality, birthday, quote FROM villagers
+WHERE name = $1 
 LIMIT 1
 `
 
-func (q *Queries) getVillager(ctx context.Context, villager string) (Villager, error) {
-	row := q.db.QueryRowContext(ctx, getVillager, villager)
+func (q *Queries) getVillager(ctx context.Context, name string) (Villager, error) {
+	row := q.db.QueryRowContext(ctx, getVillager, name)
 	var i Villager
-	err := row.Scan(&i.ID, &i.Villager)
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Image,
+		&i.Species,
+		&i.Personality,
+		&i.Birthday,
+		&i.Quote,
+	)
 	return i, err
+}
+
+const getVillagers = `-- name: getVillagers :many
+SELECT id, name, image, species, personality, birthday, quote FROM villagers
+ORDER BY name
+LIMIT $1
+`
+
+func (q *Queries) getVillagers(ctx context.Context, limit int32) ([]Villager, error) {
+	rows, err := q.db.QueryContext(ctx, getVillagers, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Villager{}
+	for rows.Next() {
+		var i Villager
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Image,
+			&i.Species,
+			&i.Personality,
+			&i.Birthday,
+			&i.Quote,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
