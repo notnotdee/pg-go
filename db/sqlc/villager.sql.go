@@ -7,13 +7,13 @@ import (
 	"context"
 )
 
-const createVillager = `-- name: createVillager :one
+const createVillager = `-- name: CreateVillager :one
 INSERT INTO villagers (name, image, species, personality, birthday, quote) 
 VALUES ($1, $2, $3, $4, $5, $6) 
 RETURNING id, name, image, species, personality, birthday, quote
 `
 
-type createVillagerParams struct {
+type CreateVillagerParams struct {
 	Name        string `json:"name"`
 	Image       string `json:"image"`
 	Species     string `json:"species"`
@@ -22,7 +22,7 @@ type createVillagerParams struct {
 	Quote       string `json:"quote"`
 }
 
-func (q *Queries) createVillager(ctx context.Context, arg createVillagerParams) (Villager, error) {
+func (q *Queries) CreateVillager(ctx context.Context, arg CreateVillagerParams) (Villager, error) {
 	row := q.db.QueryRowContext(ctx, createVillager,
 		arg.Name,
 		arg.Image,
@@ -44,13 +44,13 @@ func (q *Queries) createVillager(ctx context.Context, arg createVillagerParams) 
 	return i, err
 }
 
-const getVillager = `-- name: getVillager :one
+const getVillager = `-- name: GetVillager :one
 SELECT id, name, image, species, personality, birthday, quote FROM villagers
 WHERE name = $1 
 LIMIT 1
 `
 
-func (q *Queries) getVillager(ctx context.Context, name string) (Villager, error) {
+func (q *Queries) GetVillager(ctx context.Context, name string) (Villager, error) {
 	row := q.db.QueryRowContext(ctx, getVillager, name)
 	var i Villager
 	err := row.Scan(
@@ -65,13 +65,13 @@ func (q *Queries) getVillager(ctx context.Context, name string) (Villager, error
 	return i, err
 }
 
-const getVillagers = `-- name: getVillagers :many
+const getVillagers = `-- name: GetVillagers :many
 SELECT id, name, image, species, personality, birthday, quote FROM villagers
 ORDER BY name
 LIMIT $1
 `
 
-func (q *Queries) getVillagers(ctx context.Context, limit int32) ([]Villager, error) {
+func (q *Queries) GetVillagers(ctx context.Context, limit int32) ([]Villager, error) {
 	rows, err := q.db.QueryContext(ctx, getVillagers, limit)
 	if err != nil {
 		return nil, err

@@ -7,9 +7,9 @@ import (
 )
 
 type Querier interface {
-	createVillager(ctx context.Context, arg createVillagerParams) (Villager, error)
-	getVillager(ctx context.Context, name string) (Villager, error)
-	getVillagers(ctx context.Context, limit int32) ([]Villager, error)
+	CreateVillager(ctx context.Context, arg CreateVillagerParams) (Villager, error)
+	GetVillager(ctx context.Context, name string) (Villager, error)
+	GetVillagers(ctx context.Context, limit int32) ([]Villager, error)
 }
 
 var _ Querier = (*Queries)(nil)
