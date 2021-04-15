@@ -4,7 +4,7 @@ import "github.com/spf13/viper"
 
 type Config struct {
 	DBDriver string `mapstructure:"DB_DRIVER"`
-	DBSource string `mapstructure:"DB_CONN"`
+	DBSource string `mapstructure:"DB_SOURCE"`
 	PORT string `mapstructure:"PORT"`
 }
 

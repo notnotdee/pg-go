@@ -27,32 +27,7 @@ func (h *Handler) GetVillager(ctx *fiber.Ctx) {
 		return
 	}
 
-	if err != nil {
-		ctx.Status(fiber.StatusNotFound)
-		return
-	}
-
-	ctx.JSON(mapVillager(villager))
-}
-
-func mapVillager(villager db.Villager) interface{} {
-	return struct {
-		ID          int64  `json:"id"`
-		Name        string `json:"name"`
-		Image       string `json:"image"`
-		Species     string `json:"species"`
-		Personality string `json:"personality"`
-		Birthday    string `json:"birthday"`
-		Quote       string `json:"quote"`
-	}{
-		ID: villager.ID,
-		Name: villager.Name,
-		Image: villager.Image, 
-		Species: villager.Species, 
-		Personality: villager.Personality,
-		Birthday: villager.Birthday,
-		Quote: villager.Quote,
-	}
+	ctx.JSON(villager)
 }
 
 func (h *Handler) CreateVillager(ctx *fiber.Ctx) {
@@ -71,7 +46,7 @@ func (h *Handler) CreateVillager(ctx *fiber.Ctx) {
 		return
 	}
 
-	if err := ctx.Status(fiber.StatusCreated).JSON(mapVillager(villager)); err != nil {
+	if err := ctx.Status(fiber.StatusCreated).JSON(villager); err != nil {
 		ctx.Status(fiber.StatusInternalServerError).Send(err.Error())
 		return
 	}
