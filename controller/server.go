@@ -1,74 +1,121 @@
 package controller
 
 import (
-	"encoding/json"
+	"database/sql"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
-	"time"
 
 	db "github.com/dl-watson/pg-go/db/sqlc"
-	"github.com/gorilla/mux"
+	"github.com/dl-watson/pg-go/util"
+	"github.com/gofiber/fiber"
 )
 
-type Server struct {
-	store      db.Store
-	router     *mux.Router
+type Handler struct {
+	Store *db.Store
 }
 
-func NewServer(store db.Store) (*Server, error) {
-	server := &Server{
-		store: store,
+func NewHandler(store *db.Store) *Handler {
+	return &Handler{
+		Store: store,
 	}
-
-	server.setupRouter()
-	return server, nil
 }
 
-func getVillager(w http.ResponseWriter, r *http.Request) {
-	ACNHClient := http.Client{ Timeout: time.Second * 10 }
-	params := mux.Vars(r)
-	url := "https://ac-vill.herokuapp.com/villagers?name=" + params["name"]
-
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+func (h *Handler) GetVillager(ctx *fiber.Ctx) {
+	villager, err := h.Store.GetVillager(ctx.Context(), ctx.Params("name"))
 	if err != nil {
-		log.Fatal(err)
+		ctx.Status(fiber.StatusNotFound)
+		return
 	}
 
-	res, getErr := ACNHClient.Do(req)
-	if getErr != nil {
-		log.Fatal(getErr)
+	if err != nil {
+		ctx.Status(fiber.StatusNotFound)
+		return
 	}
 
-	if res.Body != nil {
-		defer res.Body.Close()
-	}
-
-	body, readErr := ioutil.ReadAll(res.Body)
-	if readErr != nil {
-		log.Fatal(readErr)
-	}
-
-	var villager []db.Villager
-	jsonErr := json.Unmarshal(body, &villager)
-	if jsonErr != nil {
-		log.Fatal(jsonErr)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(villager)
+	ctx.JSON(mapVillager(villager))
 }
 
-func (server *Server) setupRouter() {
-	port := "7890"
-	fmt.Printf("Starting server on port %q...\n", port)
+func mapVillager(villager db.Villager) interface{} {
+	return struct {
+		ID          int64  `json:"id"`
+		Name        string `json:"name"`
+		Image       string `json:"image"`
+		Species     string `json:"species"`
+		Personality string `json:"personality"`
+		Birthday    string `json:"birthday"`
+		Quote       string `json:"quote"`
+	}{
+		ID: villager.ID,
+		Name: villager.Name,
+		Image: villager.Image, 
+		Species: villager.Species, 
+		Personality: villager.Personality,
+		Birthday: villager.Birthday,
+		Quote: villager.Quote,
+	}
+}
 
-	// Initialize router
-	router := mux.NewRouter()
+func (h *Handler) CreateVillager(ctx *fiber.Ctx) {
+	req := new(db.CreateVillagerParams)
+	err := ctx.BodyParser(req)
+	if err != nil {
+		ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "json err",
+		})
+		return
+	}
+
+	villager, err := h.Store.CreateVillager(ctx.Context(), *req)
+	if err != nil {
+		ctx.Status(fiber.StatusInternalServerError).Send(err.Error())
+		return
+	}
+
+	if err := ctx.Status(fiber.StatusCreated).JSON(mapVillager(villager)); err != nil {
+		ctx.Status(fiber.StatusInternalServerError).Send(err.Error())
+		return
+	}
+
+	ctx.JSON(villager)
+}
+
+func setupRoutes(app *fiber.App, handler *Handler) {
+	path := app.Group("/api/v1")
+
+	setupCRUD(path, handler)
+}
+
+func setupCRUD(grp fiber.Router, handler *Handler) {
+	routes := grp.Group("/villagers")
+	routes.Get("/:name", handler.GetVillager)
+	routes.Post("/", handler.CreateVillager)
+}
+
+func SetupServer() {
+	config, err := util.LoadConfig(".")
+	if err != nil {
+		log.Fatal("cannot load config: ", err)
+	}
+
+	conn, err := sql.Open(config.DBDriver, config.DBSource)
+	if err != nil {
+		log.Fatal("cannot connect to db:", err)
+	}
+	defer conn.Close()
+
+	store := db.NewStore(conn)
 	
-	// Route handlers / endpoints
-	router.HandleFunc("/api/villagers/{name}", getVillager).Methods("GET")
+	app := fiber.New()
+	port := config.PORT
+
+	app.Get("/", func(ctx *fiber.Ctx) {
+		ctx.Send("hello world")
+	})
 	
-	log.Fatal(http.ListenAndServe(":"+port, router))
+	handler := NewHandler(store)
+
+	setupRoutes(app, handler)
+
+	fmt.Println("Starting server on port 7890...")
+	app.Listen(port)
 }
