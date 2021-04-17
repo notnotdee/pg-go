@@ -24,7 +24,7 @@ func NewHandler(store *db.Store) *Handler {
 }
 
 func (h *Handler) SeedDB(ctx *fiber.Ctx) {
-	resp, err := http.Get("https://ac-vill.herokuapp.com/villagers?perPage=397")
+	resp, err := http.Get("https://ac-vill.herokuapp.com/villagers?perPage=391")
 	if err != nil {
 		ctx.Status(fiber.StatusBadRequest)
 		return
