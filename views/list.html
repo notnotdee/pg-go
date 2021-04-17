@@ -1,0 +1,25 @@
+<div
+  class="container"
+  style="
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  "
+>
+  {{range .Villager}}
+  <div
+    class="container"
+    style="
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    "
+  >
+    <a href="views/{{.Name}}"><img class="img" src="{{.Image}}" style="width: 20vw" /></a>
+    <h1 class="name">{{.Name}}</h1>
+  </div>
+  {{end}}
+</div>

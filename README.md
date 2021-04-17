@@ -7,5 +7,11 @@
 * [golang-migrate](https://github.com/golang-migrate/migrate)
 
 ### next 
-* fix list view render
+* bug with any villager name that has a space (only agent s?)
+* broken img fallback
+* refactor server.go
 * decide proj scope
+* docker
+
+### other
+* live reload with `nodemon --exec go run main.go --signal SIGTERM`

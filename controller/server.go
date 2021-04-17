@@ -124,17 +124,9 @@ func (v *Views) VillagersView(ctx *fiber.Ctx)  {
 		return
 	}
 
-	// this map isn't working as expected, only renders the template once (which makes sense)
-	for _, v := range villager {
-		ctx.Render("template", fiber.Map{
-			"Name": v.Name,
-			"Image": v.Image,
-			"Species": v.Species,
-			"Personality": v.Personality,
-			"Birthday": v.Birthday,
-			"Quote": v.Quote,
-		})
-	}
+	ctx.Render("list", fiber.Map{
+		"Villager": villager,
+	})
 
 }
 
@@ -145,7 +137,7 @@ func (v *Views) VillagerView(ctx *fiber.Ctx)  {
 		return
 	}
 
-	ctx.Render("template", fiber.Map{
+	ctx.Render("detail", fiber.Map{
 		"Name": villager.Name,
 		"Image": villager.Image,
 		"Species": villager.Species,
