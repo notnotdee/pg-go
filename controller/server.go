@@ -2,8 +2,11 @@ package controller
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
 
 	db "github.com/dl-watson/pg-go/db/sqlc"
 	"github.com/dl-watson/pg-go/util"
@@ -18,6 +21,43 @@ func NewHandler(store *db.Store) *Handler {
 	return &Handler{
 		Store: store,
 	}
+}
+
+func (h *Handler) SeedDB(ctx *fiber.Ctx) {
+	resp, err := http.Get("https://ac-vill.herokuapp.com/villagers?perPage=397")
+	if err != nil {
+		ctx.Status(fiber.StatusBadRequest)
+		return
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		ctx.Status(fiber.StatusNotFound)
+		return
+	}
+
+	var villager []db.CreateVillagerParams
+	err = json.Unmarshal(body, &villager)
+	if err != nil {
+		log.Fatal(err)
+	}	
+
+	for _, elem := range villager {
+		villager, err := h.Store.CreateVillager(ctx.Context(), elem)
+		if err != nil {
+			ctx.Status(fiber.StatusInternalServerError).Send(err.Error())
+			return
+		}
+	
+		if err := ctx.Status(fiber.StatusCreated).JSON(villager); err != nil {
+			ctx.Status(fiber.StatusInternalServerError).Send(err.Error())
+			return
+		}
+
+		fmt.Println(villager)
+	}
+
+	ctx.JSON(villager)
 }
 
 func (h *Handler) GetVillager(ctx *fiber.Ctx) {
@@ -62,6 +102,7 @@ func setupRoutes(app *fiber.App, handler *Handler) {
 
 func setupCRUD(grp fiber.Router, handler *Handler) {
 	routes := grp.Group("/villagers")
+	routes.Get("/seed", handler.SeedDB)
 	routes.Get("/:name", handler.GetVillager)
 	routes.Post("/", handler.CreateVillager)
 }
@@ -74,7 +115,7 @@ func SetupServer() {
 
 	conn, err := sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {
-		log.Fatal("cannot connect to db:", err)
+		log.Fatal("cannot connect to db: ", err)
 	}
 	defer conn.Close()
 
@@ -82,10 +123,6 @@ func SetupServer() {
 	
 	app := fiber.New()
 	port := config.PORT
-
-	app.Get("/", func(ctx *fiber.Ctx) {
-		ctx.Send("hello world")
-	})
 	
 	handler := NewHandler(store)
 
