@@ -7,4 +7,5 @@
 * [golang-migrate](https://github.com/golang-migrate/migrate)
 
 ### next 
-* fetch data from api
+* fix list view render
+* decide proj scope
