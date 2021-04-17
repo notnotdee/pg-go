@@ -1,6 +1,6 @@
 CREATE TABLE villagers (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name TEXT NOT NULL,
+    name TEXT NOT NULL UNIQUE,
     image TEXT NOT NULL,
     species TEXT NOT NULL,
     personality TEXT NOT NULL,
