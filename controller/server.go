@@ -70,6 +70,16 @@ func (h *Handler) GetVillager(ctx *fiber.Ctx) {
 	ctx.JSON(villager)
 }
 
+func (h *Handler) GetVillagers(ctx *fiber.Ctx) {
+	villager, err := h.Store.GetVillagers(ctx.Context(), 397)
+	if err != nil {
+		ctx.Status(fiber.StatusNotFound)
+		return
+	}
+
+	ctx.JSON(villager)
+}
+
 func (h *Handler) CreateVillager(ctx *fiber.Ctx) {
 	req := new(db.CreateVillagerParams)
 	err := ctx.BodyParser(req)
@@ -103,6 +113,7 @@ func setupRoutes(app *fiber.App, handler *Handler) {
 func setupCRUD(grp fiber.Router, handler *Handler) {
 	routes := grp.Group("/villagers")
 	routes.Get("/seed", handler.SeedDB)
+	routes.Get("/", handler.GetVillagers)
 	routes.Get("/:name", handler.GetVillager)
 	routes.Post("/", handler.CreateVillager)
 }
