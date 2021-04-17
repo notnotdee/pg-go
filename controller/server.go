@@ -10,7 +10,9 @@ import (
 
 	db "github.com/dl-watson/pg-go/db/sqlc"
 	"github.com/dl-watson/pg-go/util"
+	"github.com/dl-watson/pg-go/views"
 	"github.com/gofiber/fiber"
+	_ "github.com/lib/pq"
 )
 
 type Handler struct {
@@ -105,9 +107,11 @@ func (h *Handler) CreateVillager(ctx *fiber.Ctx) {
 }
 
 func setupRoutes(app *fiber.App, handler *Handler) {
-	path := app.Group("/api/v1")
+	villagers := app.Group("/api/v1")
+	views := app.Group("/views")
 
-	setupCRUD(path, handler)
+	setupCRUD(villagers, handler)
+	setupViews(views)
 }
 
 func setupCRUD(grp fiber.Router, handler *Handler) {
@@ -116,6 +120,11 @@ func setupCRUD(grp fiber.Router, handler *Handler) {
 	routes.Get("/", handler.GetVillagers)
 	routes.Get("/:name", handler.GetVillager)
 	routes.Post("/", handler.CreateVillager)
+}
+
+func setupViews(grp fiber.Router) {
+	routes := grp.Group("/")
+	routes.Get("/", views.Default)
 }
 
 func SetupServer() {
