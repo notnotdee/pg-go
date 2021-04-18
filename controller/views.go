@@ -15,7 +15,7 @@ func NewViews(store *db.Store) *Views {
 	}
 }
 
-func (v *Views) VillagersView(ctx *fiber.Ctx)  {
+func (v *Views) VillagersView(ctx *fiber.Ctx) {
 	villager, err := v.Store.GetVillagers(ctx.Context(), 397)
 	if err != nil {
 		ctx.Status(fiber.StatusNotFound)
@@ -27,7 +27,7 @@ func (v *Views) VillagersView(ctx *fiber.Ctx)  {
 	})
 }
 
-func (v *Views) VillagerView(ctx *fiber.Ctx)  {
+func (v *Views) VillagerView(ctx *fiber.Ctx) {
 	villager, err := v.Store.GetVillager(ctx.Context(), ctx.Params("name"))
 	if err != nil {
 		ctx.Status(fiber.StatusNotFound)
@@ -35,11 +35,11 @@ func (v *Views) VillagerView(ctx *fiber.Ctx)  {
 	}
 
 	ctx.Render("detail", fiber.Map{
-		"Name": villager.Name,
-		"Image": villager.Image,
-		"Species": villager.Species,
+		"Name":        villager.Name,
+		"Image":       villager.Image,
+		"Species":     villager.Species,
 		"Personality": villager.Personality,
-		"Birthday": villager.Birthday,
-		"Quote": villager.Quote,
+		"Birthday":    villager.Birthday,
+		"Quote":       villager.Quote,
 	})
 }

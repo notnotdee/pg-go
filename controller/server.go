@@ -15,7 +15,7 @@ import (
 
 func setupRoutes(app *fiber.App, handler *Handler) {
 	villagers := app.Group("/api/v1")
-	
+
 	setupCRUD(villagers, handler)
 }
 
@@ -51,13 +51,13 @@ func SetupServer() {
 	defer conn.Close()
 
 	store := db.NewStore(conn)
-	
+
 	engine := html.New("./views", ".html")
 	app := fiber.New(&fiber.Settings{
 		Views: engine,
 	})
 	port := config.PORT
-	
+
 	handler := NewHandler(store)
 	views := NewViews(store)
 

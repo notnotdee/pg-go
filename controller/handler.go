@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -21,7 +20,6 @@ func NewHandler(store *db.Store) *Handler {
 	}
 }
 
-
 func (h *Handler) SeedDB(ctx *fiber.Ctx) {
 	resp, err := http.Get("https://ac-vill.herokuapp.com/villagers?perPage=391")
 	if err != nil {
@@ -39,7 +37,7 @@ func (h *Handler) SeedDB(ctx *fiber.Ctx) {
 	err = json.Unmarshal(body, &villager)
 	if err != nil {
 		log.Fatal(err)
-	}	
+	}
 
 	for _, elem := range villager {
 		villager, err := h.Store.CreateVillager(ctx.Context(), elem)
@@ -47,13 +45,11 @@ func (h *Handler) SeedDB(ctx *fiber.Ctx) {
 			ctx.Status(fiber.StatusInternalServerError).Send(err.Error())
 			return
 		}
-	
+
 		if err := ctx.Status(fiber.StatusCreated).JSON(villager); err != nil {
 			ctx.Status(fiber.StatusInternalServerError).Send(err.Error())
 			return
 		}
-
-		fmt.Println(villager)
 	}
 
 	ctx.JSON(villager)
@@ -102,5 +98,3 @@ func (h *Handler) CreateVillager(ctx *fiber.Ctx) {
 
 	ctx.JSON(villager)
 }
-
-
