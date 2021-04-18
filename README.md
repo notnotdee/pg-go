@@ -7,7 +7,7 @@
 * [golang-migrate](https://github.com/golang-migrate/migrate)
 
 ### next 
-* bug with any villager name that has a space (only agent s?)
+* bug with any villager name that has a space (agent s, big top, kid cat, wart jr)
 * broken img fallback
 * refactor server.go
 * decide proj scope

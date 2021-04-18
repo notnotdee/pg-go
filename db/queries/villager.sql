@@ -5,7 +5,7 @@ RETURNING *;
 
 -- name: GetVillager :one
 SELECT * FROM villagers
-WHERE name = $1 
+WHERE name = $1
 LIMIT 1;
 
 -- name: GetVillagers :many

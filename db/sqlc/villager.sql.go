@@ -46,7 +46,7 @@ func (q *Queries) CreateVillager(ctx context.Context, arg CreateVillagerParams) 
 
 const getVillager = `-- name: GetVillager :one
 SELECT id, name, image, species, personality, birthday, quote FROM villagers
-WHERE name = $1 
+WHERE name = $1
 LIMIT 1
 `
 
