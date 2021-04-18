@@ -26,16 +26,16 @@ func setupViewRoutes(app *fiber.App, views *Views) {
 
 func setupCRUD(grp fiber.Router, handler *Handler) {
 	routes := grp.Group("/villagers")
-	routes.Get("/seed", handler.SeedDB)
-	routes.Get("/", handler.GetVillagers)
-	routes.Get("/:name", handler.GetVillager)
-	routes.Post("/", handler.CreateVillager)
+	routes.Get("/seed", handler.seedDB)
+	routes.Get("/", handler.getVillagers)
+	routes.Get("/:name", handler.getVillager)
+	routes.Post("/", handler.createVillager)
 }
 
 func setupViews(grp fiber.Router, views *Views) {
 	routes := grp.Group("/")
-	routes.Get("/", views.VillagersView)
-	routes.Get("/:name", views.VillagerView)
+	routes.Get("/", views.villagersView)
+	routes.Get("/:name", views.villagerView)
 }
 
 func SetupServer() {
@@ -58,8 +58,8 @@ func SetupServer() {
 	})
 	port := config.PORT
 
-	handler := NewHandler(store)
-	views := NewViews(store)
+	handler := newHandler(store)
+	views := newViews(store)
 
 	setupRoutes(app, handler)
 	setupViewRoutes(app, views)

@@ -14,13 +14,13 @@ type Handler struct {
 	Store *db.Store
 }
 
-func NewHandler(store *db.Store) *Handler {
+func newHandler(store *db.Store) *Handler {
 	return &Handler{
 		Store: store,
 	}
 }
 
-func (h *Handler) SeedDB(ctx *fiber.Ctx) {
+func (h *Handler) seedDB(ctx *fiber.Ctx) {
 	resp, err := http.Get("https://ac-vill.herokuapp.com/villagers?perPage=391")
 	if err != nil {
 		ctx.Status(fiber.StatusBadRequest)
@@ -55,7 +55,7 @@ func (h *Handler) SeedDB(ctx *fiber.Ctx) {
 	ctx.JSON(villager)
 }
 
-func (h *Handler) GetVillager(ctx *fiber.Ctx) {
+func (h *Handler) getVillager(ctx *fiber.Ctx) {
 	villager, err := h.Store.GetVillager(ctx.Context(), ctx.Params("name"))
 	if err != nil {
 		ctx.Status(fiber.StatusNotFound)
@@ -65,7 +65,7 @@ func (h *Handler) GetVillager(ctx *fiber.Ctx) {
 	ctx.JSON(villager)
 }
 
-func (h *Handler) GetVillagers(ctx *fiber.Ctx) {
+func (h *Handler) getVillagers(ctx *fiber.Ctx) {
 	villager, err := h.Store.GetVillagers(ctx.Context(), 397)
 	if err != nil {
 		ctx.Status(fiber.StatusNotFound)
@@ -75,7 +75,7 @@ func (h *Handler) GetVillagers(ctx *fiber.Ctx) {
 	ctx.JSON(villager)
 }
 
-func (h *Handler) CreateVillager(ctx *fiber.Ctx) {
+func (h *Handler) createVillager(ctx *fiber.Ctx) {
 	req := new(db.CreateVillagerParams)
 	err := ctx.BodyParser(req)
 	if err != nil {

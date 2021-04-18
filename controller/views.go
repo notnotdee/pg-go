@@ -9,13 +9,13 @@ type Views struct {
 	Store *db.Store
 }
 
-func NewViews(store *db.Store) *Views {
+func newViews(store *db.Store) *Views {
 	return &Views{
 		Store: store,
 	}
 }
 
-func (v *Views) VillagersView(ctx *fiber.Ctx) {
+func (v *Views) villagersView(ctx *fiber.Ctx) {
 	villager, err := v.Store.GetVillagers(ctx.Context(), 397)
 	if err != nil {
 		ctx.Status(fiber.StatusNotFound)
@@ -27,7 +27,7 @@ func (v *Views) VillagersView(ctx *fiber.Ctx) {
 	})
 }
 
-func (v *Views) VillagerView(ctx *fiber.Ctx) {
+func (v *Views) villagerView(ctx *fiber.Ctx) {
 	villager, err := v.Store.GetVillager(ctx.Context(), ctx.Params("name"))
 	if err != nil {
 		ctx.Status(fiber.StatusNotFound)
