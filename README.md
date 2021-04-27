@@ -7,11 +7,13 @@
 * [golang-migrate](https://github.com/golang-migrate/migrate)
 
 ### next 
-* bug with any villager name that has a space (agent s, big top, kid cat, wart jr)
+* bug with path to=villager name that has a space (agent s, big top, kid cat, wart jr)
 * broken img fallback
-* refactor server.go
 * decide proj scope
 * docker
+* learn more about error handling conventions in go (log.Fatal() v. Panic(), etc.)
+* testing
+* sql vulnerabilities and best practices
 
 ### other
 * live reload with `nodemon --exec go run main.go --signal SIGTERM`
